@@ -125,18 +125,91 @@ public:
                                                                      modifier_flag::caps_lock,
                                                                      device_id(0));
     if (state) {
+        logger::get_logger().info("push capslock modifier");
       modifier_flag_manager_.push_back_active_modifier_flag(active_modifier_flag);
     } else {
+        logger::get_logger().info("erase capslock modifier");
       modifier_flag_manager_.erase_active_modifier_flag(active_modifier_flag);
     }
   }
 
+    bool capsLockDown = false;
+    
   void handle_keyboard_event(device_id device_id,
                              uint64_t timestamp,
                              key_code from_key_code,
                              bool pressed) {
     key_code to_key_code = from_key_code;
-
+      
+      
+      // --------------------------------------
+      // custom key mapping
+      
+      if (from_key_code == key_code::caps_lock)
+      {
+          logger::get_logger().info("detect capslock pressed: {0}", pressed);
+          capsLockDown = pressed;
+          
+          // surpress capslock
+          return;
+      }
+      
+      //if (from_key_code == types::get_key_code("a") && capsLockDown)
+      //{
+          //logger::get_logger().info("got a up");
+          //post_key(*types::get_key_code("c"), pressed, timestamp);
+          //to_key_code = *types::get_key_code("c");
+      //}
+      
+      //if (from_key_code == types::get_key_code("j") && capsLockDown)
+      //{
+          //post_key(key_code::left_arrow, pressed, timestamp);
+          //return;
+      //}
+      
+      if (capsLockDown)
+      {
+          if (from_key_code == types::get_key_code("escape"))
+          {
+              to_key_code = key_code::caps_lock;
+          }
+          if (from_key_code == types::get_key_code("l"))
+          {
+              to_key_code = key_code::right_arrow;
+          }
+          if (from_key_code == types::get_key_code("j"))
+          {
+              to_key_code = key_code::left_arrow;
+          }
+          if (from_key_code == types::get_key_code("i"))
+          {
+              to_key_code = key_code::up_arrow;
+          }
+          if (from_key_code == types::get_key_code("k"))
+          {
+              to_key_code = key_code::down_arrow;
+          }
+          if (from_key_code == types::get_key_code("u"))
+          {
+              to_key_code = key_code::home;
+          }
+          if (from_key_code == types::get_key_code("o"))
+          {
+              to_key_code = key_code::end;
+          }
+          if (from_key_code == types::get_key_code("semicolon"))
+          {
+              to_key_code = key_code::delete_or_backspace;
+          }
+          if (from_key_code == types::get_key_code("spacebar"))
+          {
+              to_key_code = key_code::return_or_enter;
+          }
+      }
+      
+      
+      
+      /*
     // ----------------------------------------
     // modify keys
     if (!pressed) {
@@ -150,8 +223,9 @@ public:
         to_key_code = it->second;
         manipulated_keys_.add(device_id, from_key_code, to_key_code);
       }
-    }
+       */
 
+    /*
     // ----------------------------------------
     // modify fn+arrow, function keys
     if (!pressed) {
@@ -214,7 +288,7 @@ public:
         manipulated_fn_keys_.add(device_id, to_key_code, *key_code);
         to_key_code = *key_code;
       }
-    }
+    }*/
 
     // ----------------------------------------
     if (post_modifier_flag_event(device_id, to_key_code, pressed, timestamp)) {
@@ -356,8 +430,10 @@ private:
                                                                        modifier_flag,
                                                                        device_id);
       if (pressed) {
+        logger::get_logger().info("push modifier");
         modifier_flag_manager_.push_back_active_modifier_flag(active_modifier_flag);
       } else {
+        logger::get_logger().info("erase modifier");
         modifier_flag_manager_.erase_active_modifier_flag(active_modifier_flag);
       }
 
