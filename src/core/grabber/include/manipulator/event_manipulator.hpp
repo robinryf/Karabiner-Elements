@@ -201,6 +201,14 @@ public:
           {
               to_key_code = key_code::delete_or_backspace;
           }
+          if (from_key_code == types::get_key_code("p"))
+          {
+              to_key_code = *types::get_key_code("delete_forward");
+          }
+          if (from_key_code == types::get_key_code("q"))
+          {
+              to_key_code = *types::get_key_code("escape");
+          }
           if (from_key_code == types::get_key_code("spacebar"))
           {
               to_key_code = key_code::return_or_enter;
