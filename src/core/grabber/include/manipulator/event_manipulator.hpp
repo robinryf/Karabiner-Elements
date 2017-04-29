@@ -213,6 +213,54 @@ public:
           {
               to_key_code = key_code::return_or_enter;
           }
+          if (from_key_code == types::get_key_code("1"))
+          {
+              to_key_code = key_code::f1;
+          }
+          if (from_key_code == types::get_key_code("2"))
+          {
+              to_key_code = key_code::f2;
+          }
+          if (from_key_code == types::get_key_code("3"))
+          {
+              to_key_code = key_code::f3;
+          }
+          if (from_key_code == types::get_key_code("4"))
+          {
+              to_key_code = key_code::f4;
+          }
+          if (from_key_code == types::get_key_code("5"))
+          {
+              to_key_code = key_code::f5;
+          }
+          if (from_key_code == types::get_key_code("6"))
+          {
+              to_key_code = key_code::f6;
+          }
+          if (from_key_code == types::get_key_code("7"))
+          {
+              to_key_code = key_code::f7;
+          }
+          if (from_key_code == types::get_key_code("8"))
+          {
+              to_key_code = key_code::f8;
+          }
+          if (from_key_code == types::get_key_code("9"))
+          {
+              to_key_code = key_code::f9;
+          }
+          if (from_key_code == types::get_key_code("0"))
+          {
+              to_key_code = key_code::f10;
+          }
+          if (from_key_code == types::get_key_code("hyphen"))
+          {
+              to_key_code = key_code::f11;
+          }
+          if (from_key_code == types::get_key_code("equal_sign"))
+          {
+              to_key_code = key_code::f12;
+          }
       }
       
       
