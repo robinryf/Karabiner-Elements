@@ -11,7 +11,6 @@
 #include "human_interface_device.hpp"
 #include "iokit_utility.hpp"
 #include "logger.hpp"
-#include "manipulator.hpp"
 #include "physical_keyboard_repeat_detector.hpp"
 #include "pressed_physical_keys_counter.hpp"
 #include "spdlog_utility.hpp"
@@ -282,7 +281,7 @@ private:
       event_manipulator_.erase_all_active_pointing_buttons(*device_id, true);
 
       physical_keyboard_repeat_detector_.erase(*device_id);
-      pressed_physical_keys_counter_.erase_all_pressed_keys(*device_id);
+      pressed_physical_keys_counter_.erase_all_matched_events(*device_id);
     }
 
     event_manipulator_.stop_key_repeat();
@@ -306,19 +305,19 @@ private:
         auto device_id = queued_event_iterator->get_device_id();
         auto time_stamp = queued_event_iterator->get_time_stamp();
 
-        if (auto key_code = queued_event_iterator->get_key_code()) {
+        if (auto key_code = queued_event_iterator->get_event().get_key_code()) {
           physical_keyboard_repeat_detector_.set(device_id, *key_code, queued_event_iterator->get_event_type());
         }
         bool pressed_physical_keys_counter_updated = pressed_physical_keys_counter_.update(*queued_event_iterator);
 
         if (device.is_grabbed() && !device.get_disabled()) {
-          if (auto key_code = queued_event_iterator->get_key_code()) {
+          if (auto key_code = queued_event_iterator->get_event().get_key_code()) {
             event_manipulator_.handle_keyboard_event(device_id,
                                                      time_stamp,
                                                      *key_code,
                                                      queued_event_iterator->get_event_type() == event_type::key_down);
 
-          } else if (auto pointing_button = queued_event_iterator->get_pointing_button()) {
+          } else if (auto pointing_button = queued_event_iterator->get_event().get_pointing_button()) {
             event_manipulator_.handle_pointing_event(device_id,
                                                      time_stamp,
                                                      pointing_event::button,
@@ -326,29 +325,29 @@ private:
                                                      queued_event_iterator->get_event_type() == event_type::key_down);
 
           } else {
-            if (auto integer_value = queued_event_iterator->get_integer_value()) {
-              if (queued_event_iterator->get_type() == event_queue::queued_event::type::pointing_x) {
+            if (auto integer_value = queued_event_iterator->get_event().get_integer_value()) {
+              if (queued_event_iterator->get_event().get_type() == event_queue::queued_event::event::type::pointing_x) {
                 event_manipulator_.handle_pointing_event(device_id,
                                                          time_stamp,
                                                          pointing_event::x,
                                                          boost::none,
                                                          *integer_value);
 
-              } else if (queued_event_iterator->get_type() == event_queue::queued_event::type::pointing_y) {
+              } else if (queued_event_iterator->get_event().get_type() == event_queue::queued_event::event::type::pointing_y) {
                 event_manipulator_.handle_pointing_event(device_id,
                                                          time_stamp,
                                                          pointing_event::y,
                                                          boost::none,
                                                          *integer_value);
 
-              } else if (queued_event_iterator->get_type() == event_queue::queued_event::type::pointing_vertical_wheel) {
+              } else if (queued_event_iterator->get_event().get_type() == event_queue::queued_event::event::type::pointing_vertical_wheel) {
                 event_manipulator_.handle_pointing_event(device_id,
                                                          time_stamp,
                                                          pointing_event::vertical_wheel,
                                                          boost::none,
                                                          *integer_value);
 
-              } else if (queued_event_iterator->get_type() == event_queue::queued_event::type::pointing_horizontal_wheel) {
+              } else if (queued_event_iterator->get_event().get_type() == event_queue::queued_event::event::type::pointing_horizontal_wheel) {
                 event_manipulator_.handle_pointing_event(device_id,
                                                          time_stamp,
                                                          pointing_event::horizontal_wheel,
@@ -391,14 +390,14 @@ private:
     if (ready_state != manipulator::event_manipulator::ready_state::ready) {
       std::string message = "event_manipulator_ is not ready. ";
       switch (ready_state) {
-      case manipulator::event_manipulator::ready_state::ready:
-        break;
-      case manipulator::event_manipulator::ready_state::virtual_hid_device_client_is_not_ready:
-        message += "(virtual_hid_device_client is not ready) ";
-        break;
-      case manipulator::event_manipulator::ready_state::virtual_hid_keyboard_is_not_ready:
-        message += "(virtual_hid_keyboard is not ready) ";
-        break;
+        case manipulator::event_manipulator::ready_state::ready:
+          break;
+        case manipulator::event_manipulator::ready_state::virtual_hid_device_client_is_not_ready:
+          message += "(virtual_hid_device_client is not ready) ";
+          break;
+        case manipulator::event_manipulator::ready_state::virtual_hid_keyboard_is_not_ready:
+          message += "(virtual_hid_keyboard is not ready) ";
+          break;
       }
       message += "Please wait for a while.";
       is_grabbable_callback_log_reducer_.warn(message);

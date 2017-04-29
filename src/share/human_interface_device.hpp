@@ -309,15 +309,15 @@ public:
           0,
           ^{
             switch (is_grabbable()) {
-            case grabbable_state::grabbable:
-              break;
+              case grabbable_state::grabbable:
+                break;
 
-            case grabbable_state::ungrabbable_temporarily:
-              return;
+              case grabbable_state::ungrabbable_temporarily:
+                return;
 
-            case grabbable_state::ungrabbable_permanently:
-              cancel_grab_timer();
-              return;
+              case grabbable_state::ungrabbable_permanently:
+                cancel_grab_timer();
+                return;
             }
 
             // ----------------------------------------
@@ -640,7 +640,7 @@ private:
           auto integer_value = IOHIDValueGetIntegerValue(value);
 
           if (event_queue_) {
-            event_queue_->push_back_event(device_id_, time_stamp, usage_page, usage, integer_value);
+            event_queue_->emplace_back_event(device_id_, time_stamp, usage_page, usage, integer_value);
           }
         }
 
