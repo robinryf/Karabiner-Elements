@@ -124,10 +124,8 @@ public:
                                                                      modifier_flag::caps_lock,
                                                                      device_id(0));
     if (state) {
-        logger::get_logger().info("push capslock modifier");
       modifier_flag_manager_.push_back_active_modifier_flag(active_modifier_flag);
     } else {
-        logger::get_logger().info("erase capslock modifier");
       modifier_flag_manager_.erase_active_modifier_flag(active_modifier_flag);
     }
   }
@@ -138,7 +136,8 @@ public:
                              uint64_t timestamp,
                              key_code from_key_code,
                              bool pressed) {
-    key_code to_key_code = from_key_code;
+      key_code to_key_code = from_key_code;
+      key_code modifier_key_code = *types::get_key_code("vk_none");
       
       
       // --------------------------------------
@@ -146,7 +145,7 @@ public:
       
       if (from_key_code == key_code::caps_lock)
       {
-          logger::get_logger().info("detect capslock pressed: {0}", pressed);
+          //logger::get_logger().info("detect capslock pressed: {0}", pressed);
           capsLockDown = pressed;
           
           // surpress capslock
@@ -190,11 +189,15 @@ public:
           }
           if (from_key_code == types::get_key_code("u"))
           {
-              to_key_code = key_code::home;
+              modifier_key_code = *types::get_key_code("left_command");
+              to_key_code = key_code::left_arrow;
+              //to_key_code = key_code::home;
           }
           if (from_key_code == types::get_key_code("o"))
           {
-              to_key_code = key_code::end;
+              modifier_key_code = *types::get_key_code("left_command");
+              to_key_code = key_code::right_arrow;
+              //to_key_code = key_code::end;
           }
           if (from_key_code == types::get_key_code("semicolon"))
           {
@@ -349,8 +352,20 @@ public:
     if (post_modifier_flag_event(device_id, to_key_code, pressed, timestamp)) {
       return;
     }
+      
+      if (pressed && modifier_key_code != types::get_key_code("vk_none"))
+      {
+          //logger::get_logger().info("modifier down");
+          post_key(modifier_key_code, pressed, timestamp);
+      }
 
     post_key(to_key_code, pressed, timestamp);
+      
+      if (pressed == false && modifier_key_code != types::get_key_code("vk_none"))
+      {
+          //logger::get_logger().info("modifier up");
+          post_key(modifier_key_code, pressed, timestamp);
+      }
   }
 
   void handle_pointing_event(device_id device_id,
@@ -485,10 +500,10 @@ private:
                                                                        modifier_flag,
                                                                        device_id);
       if (pressed) {
-        logger::get_logger().info("push modifier");
+        //logger::get_logger().info("push modifier");
         modifier_flag_manager_.push_back_active_modifier_flag(active_modifier_flag);
       } else {
-        logger::get_logger().info("erase modifier");
+        //logger::get_logger().info("erase modifier");
         modifier_flag_manager_.erase_active_modifier_flag(active_modifier_flag);
       }
 
